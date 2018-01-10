@@ -4,6 +4,7 @@ class BaseConfig(object):
 class DevelopmentConfig(BaseConfig):
     DEBUG = True
     SQLALCHEMY_DATABASE_URI = 'mysql+mysqldb://root:xqxq1994@localhost:3306/simpledu?charset=utf8'
+    INDEX_PER_PAGE = 9
 
 class ProductionConfig(BaseConfig):
     pass
