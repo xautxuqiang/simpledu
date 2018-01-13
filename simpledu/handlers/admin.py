@@ -4,6 +4,8 @@ from simpledu.models import db, Course, User
 
 from simpledu.forms import CourseForm, UserForm, UpdateUserForm
 
+from flask_login import current_user
+
 admin = Blueprint('admin', __name__, url_prefix='/admin')
 
 @admin.route('/')
@@ -78,17 +80,25 @@ def create_user():
 def edit_user(user_id):
     user = User.query.get_or_404(user_id)
     form = UpdateUserForm(obj=user)
-    before_username = user.username
-    before_email = user.email
     if form.validate_on_submit():
-       form.update_user(user)
-       flash('修改用户成功', 'success')
-       return redirect(url_for('admin.users'))
+       form.populate_obj(user)
+       db.session.add(user)
+       try:
+           db.session.commit()
+       except:
+           db.session.rollback()
+           flash('用户或邮箱已经存在', 'warning')
+       else:
+           flash('用户信息更新成功', 'success')
+           return redirect(url_for('admin.users'))
     return render_template('admin/edit_user.html', form=form, user=user)
 
 @admin.route('/users/<int:user_id>/delete')
 @admin_required
 def delete_user(user_id):
+    if current_user.id == user_id:
+        flash("用户不能自我删除", "warning")
+        return redirect(url_for('admin.users'))
     user = User.query.get_or_404(user_id)
     db.session.delete(user)
     db.session.commit()

@@ -108,8 +108,7 @@ class UserForm(FlaskForm):
 
 class UpdateUserForm(UserForm):
     def validate_username(self, field):
-        pass 
+        pass
 
     def validate_email(self, field):
         pass
-
